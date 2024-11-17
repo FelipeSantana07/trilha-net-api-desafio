@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TrilhaApiDesafio.Context;
 using TrilhaApiDesafio.Models;
+using Microsoft.EntityFrameworkCore;
+
+
 
 namespace TrilhaApiDesafio.Controllers
 {
@@ -16,27 +19,45 @@ namespace TrilhaApiDesafio.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult ObterPorId(int id)
+        public async Task<IActionResult> ObterPorId(int id)
         {
-            // TODO: Buscar o Id no banco utilizando o EF
-            // TODO: Validar o tipo de retorno. Se não encontrar a tarefa, retornar NotFound,
-            // caso contrário retornar OK com a tarefa encontrada
-            return Ok();
+            var tarefa = await _context.Tarefas.FindAsync(id);
+            if (tarefa == null)
+            {
+                return NotFound(new { Message = "Tarefa não encontrada" });
+            }
+
+            return Ok(tarefa);
         }
 
         [HttpGet("ObterTodos")]
-        public IActionResult ObterTodos()
+        public async Task<IActionResult> ObterTodos()
         {
-            // TODO: Buscar todas as tarefas no banco utilizando o EF
-            return Ok();
+            var tarefas = await _context.Tarefas.ToListAsync();
+            return Ok(tarefas);
         }
 
         [HttpGet("ObterPorTitulo")]
-        public IActionResult ObterPorTitulo(string titulo)
+        public async Task<IActionResult> ObterPorTitulo(string titulo)
         {
+            if (string.IsNullOrWhiteSpace(titulo))
+            {
+                return BadRequest("Titulo não pode ser vazio.");
+            }
+
+            var tarefas = await _context.Tarefas
+                .Where(t => t.Titulo.ToLower().Contains(titulo.ToLower()))
+                .ToListAsync();
+
             // TODO: Buscar  as tarefas no banco utilizando o EF, que contenha o titulo recebido por parâmetro
             // Dica: Usar como exemplo o endpoint ObterPorData
-            return Ok();
+
+            if (!tarefas.Any())
+            {
+                return NotFound("Nenhuma tarefa encontrada com o título especificado.");
+            }
+
+            return Ok(tarefas);
         }
 
         [HttpGet("ObterPorData")]

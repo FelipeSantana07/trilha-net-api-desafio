@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:latest
+    hostname: db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=user
+      - POSTGRES_DB=task
+    ports:
+      - '4422:5432'
