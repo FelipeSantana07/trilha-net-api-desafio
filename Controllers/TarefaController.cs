@@ -123,13 +123,11 @@ namespace TrilhaApiDesafio.Controllers
             var tarefaBanco = await _context.Tarefas.FindAsync(id);
 
             if (tarefaBanco == null)
-                return NotFound();
+                return NotFound("Tarefa não encontrada.");
 
-            _context.Tarefas.ExecuteDeleteAsync(tarefaBanco);
+            _context.Tarefas.Remove(tarefaBanco);
             await _context.SaveChangesAsync();
 
-
-            // TODO: Remover a tarefa encontrada através do EF e salvar as mudanças (save changes)
             return NoContent();
         }
     }
